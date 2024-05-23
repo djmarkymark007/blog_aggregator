@@ -1,6 +1,8 @@
 package main
 
-import "net/http"
+import (
+	"net/http"
+)
 
 func readiness(w http.ResponseWriter, r *http.Request) {
 	respondWithJson(w, 200, map[string]string{"status": "ok"})
