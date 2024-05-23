@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/djmarkymark007/blog_aggregator/internal/database"
@@ -41,7 +42,29 @@ func createUsers(w http.ResponseWriter, r *http.Request) {
 	user, err := config.DB.CreateUser(r.Context(), query)
 	if err != nil {
 		log.Printf("couldn't create user. %s", err)
-		respondWithError(w, http.StatusInternalServerError, "couldn't creat user")
+		respondWithError(w, http.StatusInternalServerError, "couldn't create user")
+		return
+	}
+
+	respondWithJson(w, 200, databaseUsertoUser(user))
+}
+
+func getApiKey(r *http.Request) string {
+	apiKey := r.Header.Values("Authorization")[0]
+	apiKey = strings.TrimLeft(apiKey, "ApiKey ")
+	return apiKey
+}
+
+func getUsers(w http.ResponseWriter, r *http.Request) {
+	apiKey := getApiKey(r)
+	if len(apiKey) != 64 {
+		respondWithError(w, 400, "Invalid api key")
+		return
+	}
+	user, err := config.DB.GetUserByApiKey(r.Context(), apiKey)
+	if err != nil {
+		log.Printf("couldn't get user by api key. %s", err)
+		respondWithError(w, http.StatusInternalServerError, "couldn't get user")
 		return
 	}
 

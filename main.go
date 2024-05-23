@@ -42,6 +42,7 @@ func main() {
 	serverHandler.HandleFunc("GET /v1/readiness", readiness)
 	serverHandler.HandleFunc("GET /v1/err", errTest)
 	serverHandler.HandleFunc("POST /v1/users", createUsers)
+	serverHandler.HandleFunc("GET /v1/users", getUsers)
 
 	server := http.Server{Handler: serverHandler, Addr: ":" + port}
 
