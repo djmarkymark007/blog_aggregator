@@ -12,6 +12,7 @@ import (
 	_ "github.com/lib/pq"
 )
 
+// NOTE(Mark): should this be here or in auth.go?
 type apiConfig struct {
 	DB *database.Queries
 }
@@ -42,7 +43,9 @@ func main() {
 	serverHandler.HandleFunc("GET /v1/readiness", readiness)
 	serverHandler.HandleFunc("GET /v1/err", errTest)
 	serverHandler.HandleFunc("POST /v1/users", createUsers)
-	serverHandler.HandleFunc("GET /v1/users", getUsers)
+	serverHandler.HandleFunc("GET /v1/users", config.middlewareAuth(getUsers))
+	serverHandler.HandleFunc("POST /v1/feeds", config.middlewareAuth(createFeed))
+	serverHandler.HandleFunc("GET /v1/feeds", getFeed)
 
 	server := http.Server{Handler: serverHandler, Addr: ":" + port}
 
